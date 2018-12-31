@@ -22,8 +22,8 @@ VGG网络是在AlexNet网络的基础上发展而来的，其主要贡献在于�
 
 ### Notice:
 * 全部conv均使用了3×3的卷积核
-* 一共使用了5次maxpooling，也就意味着$out_{resolution} = input_{resolution} / 2^5$
-![vgg_config](./img/vgg_config.png)
+* 一共使用了5次maxpooling，也就意味着$out_{resolution} = input_{resolution} / 2^5$  
+![vgg_config](/img/vgg_config.png)
 * 最后有三个全连接层(nn.Linear)，因此VGG参数量巨大
 * 因为用到了FC，输入tensor的H和W需要固定(3×224×224)
 ### 代码剖析
@@ -131,13 +131,14 @@ Kaiming大神的代表作之一，被广泛应用于各种网络作为backbone�
 * `in_planes, out_planes` 即输入输出通道的数量，从Resnet之后，网络都是以模块化搭建。Resnet包含两种基本模块:
 * **residual**残差使用的是**pixel-wise**相加  
 * **基本模块:**
- * BasicBlock(左，Resnet-34及以下使用的模块)
- * BottleNeck(右，Resnet-50及以上使用1x1conv进行通道缩放，从而减少3x3conv的参数量)
-![resnet-basicblock](./img/basicblock.png)
+ * BasicBlock(左，Resnet-34及以下使用的模块)  
+ ![resnet-34]
+ * BottleNeck(右，Resnet-50及以上使用1x1conv进行通道缩放，从而减少3x3conv的参数量)  
+![resnet-block](/img/basicblock.png)
 这两种网络在论文中都有详细介绍。其中浅层ReseNet-34层用了BasicBlock，深层的50及以上使用了BottleNeck  
 * 无论哪个深度，Resnet一共包含5个stage，第一个stage使用了7×7的conv，紧跟着maxpooling
-* Resnet-50和Resnet-34使用的都是[3,4,6,3]重复模式，每经过一个阶段，resolution/2,channel*2
-![resnet_](./img/resnet_cfg.png)
+* Resnet-50和Resnet-34使用的都是[3,4,6,3]重复模式，每经过一个阶段，resolution/2,channel*2  
+![resnet_](/img/resnet_cfg.png)
 * Resnet 在stage2-5均没有用maxpooling进行resolution变化，使用stride=2进行downsample
 
 
