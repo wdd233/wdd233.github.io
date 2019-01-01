@@ -127,8 +127,8 @@ Kaiming大神的代表作之一，被广泛应用于各种网络作为backbone�
 * Resnet 在stage2-5均没有用maxpooling进行resolution变化，使用stride=2进行downsample
 
 ### Projection
-Resnet不同stage连接处会出现通道和分辨率不匹配的问题，为了完成尺度匹配，使用带有Projection的Block，即使用downsample的BasicBlock。  
-[resnet-projection](/img/resnet_projection.jpg)
+Resnet不同stage连接处会出现通道和分辨率不匹配的问题，无法直接pixel add。为了完成尺度匹配，使用带有Projection的Block，即使用downsample的BasicBlock，将通道拉升到指定数量，同时使用stride=2降低分辨率  
+![resnet-projection](/img/resnet_projection.jpg)
 >The projection shortcut in Eqn2. is used to match dimensions (done by 1x1 conv). For both options, when the shortcuts go across feature maps of two sizes, they are performed with a stride of 2.(Resnet原文介绍Projection)
 ### 代码剖析：
 ```python
