@@ -6,8 +6,8 @@
 <ul class="list-inline text-center">
 {% else %}
 <ul class="list-inline">
+    
 {% endif %}
-
   {% if site.RSS %}
   <li>
     <a href="{{ "/feed.xml" | prepend: site.baseurl }}">
@@ -16,7 +16,8 @@
         <i class="fa fa-rss fa-stack-1x fa-inverse"></i>
       </span>
     </a>
-  </li>
+  </li>  
+        
   {% endif %}
   {% if site.zhihu_username %}
   <li>
@@ -27,26 +28,8 @@
       </span>
     </a>
   </li>
+    
   {% endif %}
-  {% if site.weibo_username %}
-  <li>
-    <a target="_blank" href="http://weibo.com/{{ site.weibo_username }}">
-      <span class="fa-stack fa-lg">
-        <i class="fa fa-circle fa-stack-2x"></i>
-        <i class="fa fa-weibo fa-stack-1x fa-inverse"></i>
-      </span>
-    </a>
-  </li>
-  {% endif %}
-  {% if site.leanote_username %}
-  <li>
-    <a target="_blank" href="http://blog.leanote.com/{{ site.leanote_username }}">
-      <span class="fa-stack fa-lg">
-        <i class="fa fa-circle fa-stack-2x"></i>
-        <i class="fa fa-stack-1x fa-inverse">蚂</i>
-      </span>
-    </a>
-</li>
   {% if site.github_username %}
   <li>
     <a target="_blank" href="https://github.com/{{ site.github_username }}">
@@ -56,6 +39,30 @@
       </span>
     </a>
   </li>
+    
+  {% endif %}
+  {% if site.leanote_username %}
+  <li>
+    <a target="_blank" href="http://blog.leanote.com/{{ site.leanote_username }}">
+      <span class="fa-stack fa-lg">
+        <i class="fa fa-circle fa-stack-2x"></i>
+        <i class="fa fa-stack-1x fa-inverse">蚂</i>
+      </span>
+    </a>
+  </li>
+    
+  {% endif %}
+  {% if site.csdn_username %}
+  <li>
+    <a target="_blank" href="https://blog.csdn.net/{{ site.csdn_username }}">
+      <span class="fa-stack fa-lg">
+        <i class="fa fa-circle fa-stack-2x"></i>
+        <i class="fa fa-stack-1x fa-inverse">CSDN</i>
+      </span>
+    </a>
+  </li>  
+
+    
   {% endif %}
   {% if site.linkedin_username %}
   <li>
@@ -66,5 +73,6 @@
       </span>
     </a>
   </li>
+    
   {% endif %}
 </ul>
