@@ -1,9 +1,11 @@
+
 ---
 layout: post
 title:  "pytorch深度指南-经典CNN网络源码剖析"
 date:   2018-12-31 23:14:58 +0800
 categories: jekyll update
 ---
+
 # 经典CNN
 常用来做为主干网络，也就是paper中常常提到的backbone，用于实现分类或提取特征  
 pytroch给出了经典网络的搭建代码，放在`torchvision.models`中，官方封装好了类接口，可以直接调用  
@@ -22,7 +24,7 @@ VGG网络是在AlexNet网络的基础上发展而来的，其主要贡献在于�
 
 ### Notice:
 * 全部conv均使用了3×3的卷积核
-* 一共使用了5次maxpooling，也就意味着$out_{resolution} = input_{resolution} / 2^5$  
+* 一共使用了5次maxpooling，也就意味着$out_{resolution} = input_{resolution} / 2^5$
 ![vgg_config](/img/vgg_config.png)
 * 最后有三个全连接层(nn.Linear)，因此VGG参数量巨大
 * 因为用到了FC，输入tensor的H和W需要固定(3×224×224)
@@ -102,22 +104,6 @@ def vgg16(pretrained=False, **kwargs):#VGG16使用了cfg['D']结构
     return model
 ```
 
-
-    ---------------------------------------------------------------------------
-
-    NameError                                 Traceback (most recent call last)
-
-    <ipython-input-1-4b898aae7123> in <module>()
-    ----> 1 class VGG(nn.Module):
-          2     def __init__(self, features, num_classes=1000, init_weights=True):#ImageNet训练共1000类
-          3         super(VGG, self).__init__()
-          4         self.features = features#提取特征部分，也就是CNN部分
-          5         self.classifier = nn.Sequential(#分类部分，也就是全连接层部分
-
-
-    NameError: name 'nn' is not defined
-
-
 **打个总结：**
 * 确定网络基模块，利用图纸化(cfg)搭建复杂网络结构  
 * 使用`nn.Sequential()`打造多个重复基模块
@@ -131,17 +117,20 @@ Kaiming大神的代表作之一，被广泛应用于各种网络作为backbone�
 * `in_planes, out_planes` 即输入输出通道的数量，从Resnet之后，网络都是以模块化搭建。Resnet包含两种基本模块:
 * **residual**残差使用的是**pixel-wise**相加  
 * **基本模块:**
- * BasicBlock(左，Resnet-34及以下使用的模块)  
- ![resnet-34]
- * BottleNeck(右，Resnet-50及以上使用1x1conv进行通道缩放，从而减少3x3conv的参数量)  
-![resnet-block](/img/basicblock.png)
+ * BasicBlock(左，Resnet-34及以下使用的模块)
+ * BottleNeck(右，Resnet-50及以上使用1x1conv进行通道缩放，从而减少3x3conv的参数量)
+![resnet-basicblock](/img/basicblock.png)
 这两种网络在论文中都有详细介绍。其中浅层ReseNet-34层用了BasicBlock，深层的50及以上使用了BottleNeck  
 * 无论哪个深度，Resnet一共包含5个stage，第一个stage使用了7×7的conv，紧跟着maxpooling
-* Resnet-50和Resnet-34使用的都是[3,4,6,3]重复模式，每经过一个阶段，resolution/2,channel*2  
+* Resnet-50和Resnet-34使用的都是[3,4,6,3]重复模式，每经过一个阶段，resolution/2,channel*2
 ![resnet_](/img/resnet_cfg.png)
 * Resnet 在stage2-5均没有用maxpooling进行resolution变化，使用stride=2进行downsample
 
-
+### Projection
+Resnet不同stage连接处会出现通道和分辨率不匹配的问题，为了完成尺度匹配，使用带有Projection的Block，即使用downsample的BasicBlock。  
+[resnet-projection](/img/resnet_projection.jpg)
+>The projection shortcut in Eqn2. is used to match dimensions (done by 1x1 conv). For both options, when the shortcuts go across feature maps of two sizes, they are performed with a stride of 2.(Resnet原文介绍Projection)
+### 代码剖析：
 ```python
 def conv3x3(in_planes, out_planes, stride=1):#基本的3x3卷积
     """3x3 convolution with padding"""
@@ -170,7 +159,7 @@ class BasicBlock(nn.Module):#BasicBlock模块
         out = self.conv2(out)
         out = self.bn2(out)
 
-        if self.downsample is not None:
+        if self.downsample is not None:#在downsample网络使用stride=2的降分辨率作为残差
             residual = self.downsample(x)
 
         out += residual#经过conv后与之前的input相加
@@ -179,9 +168,9 @@ class BasicBlock(nn.Module):#BasicBlock模块
         return out
 
 class Bottleneck(nn.Module):#Bottleneck模块
-    expansion = 4#注意，bottleneck要对通道拉伸，用到expansion
+    expansion = 4#注意，bottleneck要对输入通道做4倍拉升，用到expansion
 
-    def __init__(self, inplanes, planes, stride=1, downsample=None):
+    def __init__(self, , stride=1, downsample=None):
         super(Bottleneck, self).__init__()
         self.conv1 = nn.Conv2d(inplanes, planes, kernel_size=1, bias=False)
         self.bn1 = nn.BatchNorm2d(planes)
@@ -192,7 +181,7 @@ class Bottleneck(nn.Module):#Bottleneck模块
         #最后的conv的channel是输入的4倍
         self.bn3 = nn.BatchNorm2d(planes * 4)
         self.relu = nn.ReLU(inplace=True)
-        self.downsample = downsample
+        self.downsample = downsample#downsample即stride=2的层
         self.stride = stride
 
     def forward(self, x):
@@ -209,7 +198,7 @@ class Bottleneck(nn.Module):#Bottleneck模块
         out = self.conv3(out)
         out = self.bn3(out)
 
-        if self.downsample is not None:
+        if self.downsample is not None:#在downsample网络使用stride=2的降分辨率作为残差
             residual = self.downsample(x)
 
         out += residual
@@ -227,7 +216,8 @@ class ResNet(nn.Module):
         self.bn1 = nn.BatchNorm2d(64)
         self.relu = nn.ReLU(inplace=True)
         self.maxpool = nn.MaxPool2d(kernel_size=3, stride=2, padding=1)#Stage1中唯一出现了一次Maxpooling
-        self.layer1 = self._make_layer(block, 64, layers[0])
+        #C2-C5输入通道数量[64,128,256,512]
+        self.layer1 = self._make_layer(block, 64, layers[0])#注意:layer1的stride=1!
         self.layer2 = self._make_layer(block, 128, layers[1], stride=2)
         self.layer3 = self._make_layer(block, 256, layers[2], stride=2)
         self.layer4 = self._make_layer(block, 512, layers[3], stride=2)
@@ -244,17 +234,17 @@ class ResNet(nn.Module):
 
     def _make_layer(self, block, planes, blocks, stride=1):#同样使用了_make_layer的方式造基模块轮子
         downsample = None
-        if stride != 1 or self.inplanes != planes * block.expansion:
-            downsample = nn.Sequential(
-                nn.Conv2d(self.inplanes, planes * block.expansion,
+        if stride != 1 or self.inplanes != planes * block.expansion:#只有在stage节点交汇处才会downsample
+            downsample = nn.Sequential(#downsample表示在不同stage的节点连接处降分辨率同时提升通道数
+                nn.Conv2d(self.inplanes, planes * block.expansion,#使用1x1升通道降分辨
                           kernel_size=1, stride=stride, bias=False),
                 nn.BatchNorm2d(planes * block.expansion),
             )
-
+            
         layers = []
-        layers.append(block(self.inplanes, planes, stride, downsample))
-        self.inplanes = planes * block.expansion
-        for i in range(1, blocks):
+        layers.append(block(self.inplanes, planes, stride, downsample))#每个stage的第一个block可能会有downsample，
+        self.inplanes = planes * block.expansion#迭代更新inplanes=planes*4，为下一层输入的通道数量
+        for i in range(1, blocks):#剩余的block都是同样的搞法
             layers.append(block(self.inplanes, planes))
 
         return nn.Sequential(*layers)
@@ -271,7 +261,7 @@ class ResNet(nn.Module):
         x = self.layer4(x)
 
         x = self.avgpool(x)
-        x = x.view(x.size(0), -1)
+        x = x.view(x.size(0), -1)#尺度变化从而送入后面的全连接层
         x = self.fc(x)
 
         return x
@@ -283,7 +273,7 @@ def resnet50(pretrained=False, **kwargs):#Resnet API调用接口
     Args:
         pretrained (bool): If True, returns a model pre-trained on ImageNet
     """
-    model = ResNet(Bottleneck, [3, 4, 6, 3], **kwargs)
+    model = ResNet(Bottleneck, [3, 4, 6, 3], **kwargs)#[3,4,6,3]为各个stage中block重复次数
     if pretrained:
         model.load_state_dict(model_zoo.load_url(model_urls['resnet50']))
     return model
