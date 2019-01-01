@@ -122,7 +122,7 @@ Kaiming大神的代表作之一，被广泛应用于各种网络作为backbone�
 ![resnet-basicblock](/img/basicblock.png)
 这两种网络在论文中都有详细介绍。其中浅层ReseNet-34层用了BasicBlock，深层的50及以上使用了BottleNeck  
 * 无论哪个深度，Resnet一共包含5个stage，第一个stage使用了7×7的conv，紧跟着maxpooling
-* Resnet-50和Resnet-34使用的都是[3,4,6,3]重复模式，每经过一个阶段，resolution/2,channel*2
+* Resnet-50和Resnet-34使用的都是[3,4,6,3]重复模式，每经过一个阶段(C2阶段除外，因为C1缩小了4倍)，resolution/2,channel*2
 ![resnet_](/img/resnet_cfg.png)
 * Resnet 在stage2-5均没有用maxpooling进行resolution变化，使用stride=2进行downsample
 
@@ -222,7 +222,7 @@ class ResNet(nn.Module):
         self.relu = nn.ReLU(inplace=True)
         self.maxpool = nn.MaxPool2d(kernel_size=3, stride=2, padding=1)#C1中唯一出现了一次Maxpooling
         #C2-C5输入通道数量[64,128,256,512]
-        self.layer1 = self._make_layer(block, 64, layers[0])#注意:layer1的stride=1!
+        self.layer1 = self._make_layer(block, 64, layers[0])#注意:layer1的stride=1!，C2阶段没有降低分辨率
         self.layer2 = self._make_layer(block, 128, layers[1], stride=2)
         self.layer3 = self._make_layer(block, 256, layers[2], stride=2)
         self.layer4 = self._make_layer(block, 512, layers[3], stride=2)
