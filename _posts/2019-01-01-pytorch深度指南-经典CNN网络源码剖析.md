@@ -168,7 +168,8 @@ class BasicBlock(nn.Module):#BasicBlock模块
         return out
 
 class Bottleneck(nn.Module):#Bottleneck模块
-    expansion = 4#注意，bottleneck要对输入通道做4倍拉升，用到expansion
+    expansion = 4
+    #注意，bottleneck要对输入通道做4倍拉升,可以看上面的结构示意图中每个Block结构
 
     def __init__(self, , stride=1, downsample=None):
         super(Bottleneck, self).__init__()
@@ -197,8 +198,10 @@ class Bottleneck(nn.Module):#Bottleneck模块
 
         out = self.conv3(out)
         out = self.bn3(out)
-
-        if self.downsample is not None:#在downsample网络使用stride=2的降分辨率作为残差
+        
+        #在downsample使用了1x1，stride=2的conv降分辨率拉升通道，
+        #具体结构见Projection那部分示意图
+        if self.downsample is not None:
             residual = self.downsample(x)
 
         out += residual
@@ -215,7 +218,7 @@ class ResNet(nn.Module):
                                bias=False)#注意开始的conv1使用了K=7,S=2
         self.bn1 = nn.BatchNorm2d(64)
         self.relu = nn.ReLU(inplace=True)
-        self.maxpool = nn.MaxPool2d(kernel_size=3, stride=2, padding=1)#Stage1中唯一出现了一次Maxpooling
+        self.maxpool = nn.MaxPool2d(kernel_size=3, stride=2, padding=1)#C1中唯一出现了一次Maxpooling
         #C2-C5输入通道数量[64,128,256,512]
         self.layer1 = self._make_layer(block, 64, layers[0])#注意:layer1的stride=1!
         self.layer2 = self._make_layer(block, 128, layers[1], stride=2)
