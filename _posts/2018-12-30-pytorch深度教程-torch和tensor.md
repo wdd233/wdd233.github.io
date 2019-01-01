@@ -22,11 +22,12 @@ import torch
     shape(tuple or *size) - 新的shape 
     如果还剩下一个维度，很好，你可以直接使用-1来替代，表示这个维度中应该有的元素数量
 ## torch/Tensor.view()
-改变形状
+与reshape功能类似，将源tensor的shape改变指定形状。
 
-rned tensor will be a view of input. Otherwise, it will be a copy. Contiguous inputs and inputs with compatible strides can be reshaped without copying, but you should not depend on the copying vs. viewing behavior.
+原文中这样描述
+Returned tensor will be a view of input. Otherwise, it will be a copy. Contiguous inputs and inputs with compatible strides can be reshaped without copying, but you should not depend on the copying vs. viewing behavior.
 
->二者区别：当tensor都为contiguous类型(邻近模式)时，两个函数并无差异，使用原来的数据内容，不会复制一份新的出来；如果tensor不是，例如经过了transpose或permute之后，需要contiguous然后再使用view
+>二者区别：当tensor都为contiguous类型(邻近模式)时，两个函数并无差异，使用原来的数据内容，不会复制一份新的出来；如果tensor不是，例如经过了transpose或permute之后，需要contiguous然后再使用view。reshape其实就是.contiguous+view,这样不会开辟新的空间存放tensor，而是共享原来的数据内存。
 
 
 ```python
@@ -261,8 +262,8 @@ a#可以看到虽然对b操作，但是原始a的值也发生了变化
               [  7.,   8.,   9.,  10.,  11.]]]])
 
 
-## torch/Tensor.unsqueeze()
-
+## torch/Tensor.unsqueeze(dim)
+提升一个新的维度,该dim=1，例如:(2,6)->(1,2,6)
 ## torch.transpose(input, dim0, dim1) → Tensor
 轴/坐标索引 交换
 
@@ -383,7 +384,7 @@ print('c_grad:', c.grad)
 tensor内部全部填充value元素
 
 ### Tensor.zero_()
-
+tensor内容全部填充0
 ### Tensor.normal_(mean, std, out=None)
 
 ```python
