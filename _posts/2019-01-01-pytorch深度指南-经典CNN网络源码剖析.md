@@ -130,6 +130,8 @@ Kaiming大神的代表作之一，被广泛应用于各种网络作为backbone�
 Resnet不同stage连接处会出现通道和分辨率不匹配的问题，无法直接pixel add。为了完成尺度匹配，使用带有Projection的Block，即使用downsample的BasicBlock，将通道拉升到指定数量，同时使用stride=2降低分辨率  
 ![resnet-projection](/img/resnet_projection.jpg)
 >The projection shortcut in Eqn2. is used to match dimensions (done by 1x1 conv). For both options, when the shortcuts go across feature maps of two sizes, they are performed with a stride of 2.(Resnet原文介绍Projection)
+
+
 ### 代码剖析：
 ```python
 def conv3x3(in_planes, out_planes, stride=1):#基本的3x3卷积
