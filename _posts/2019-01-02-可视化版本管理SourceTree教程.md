@@ -7,14 +7,22 @@ categories: jekyll update
 
 # SourceTree使用教程
 * 检出分支
+<<<<<<< HEAD
 ![分支](/img/sourcetree_checkout.png)  
+=======
+>>>>>>> featrue_1
 通常项目是三种分支类型：
  * master:主分支，稳定版本；
  * develop: 日常开发分支，每个项目版本稳定之后，合并到master分支；
  * fix： 线上紧急bug,从master创建fix分支，修复测试通过后，合并到master主分支
+<<<<<<< HEAD
 ![检出](/img/sourcetree_branch.png)
 #### 暂存、丢弃、移除的区别
 ![out](/img/sourcetree_drop.png)
+=======
+
+#### 暂存、丢弃、移除的区别
+>>>>>>> featrue_1
 * 暂存文件： 打钩为咱村的文件，会将文件放在已暂存文件筐中
 * 丢弃文件： 放弃该次的更改，会改变workspace的文件内容，表示此次工作区文件更改不被认可
 * 移除文件： 指的是从工作区删除文件
