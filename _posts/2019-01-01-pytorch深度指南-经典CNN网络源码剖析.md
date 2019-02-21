@@ -127,7 +127,7 @@ Kaiming大神的代表作之一，被广泛应用于各种网络作为backbone�
 * Resnet 在stage2-5均没有用maxpooling进行resolution变化，使用stride=2进行downsample
 
 ### Projection
-Resnet不同stage连接处会出现通道和分辨率不匹配的问题，无法直接pixel add。为了完成尺度匹配，使用带有Projection的Block，即使用downsample的BasicBlock，将通道拉升到指定数量，同时使用stride=2降低分辨率  
+Resnet不同stage连接处会出现通道和分辨率不匹配的问题，无法直接pixel add。为了完成尺度匹配，在每个stage的最后一个使用带有Projection的Block，即使用downsample的BasicBlock，将通道拉升到指定数量，同时使用stride=2的conv(中间3x3那个)降低分辨率  
 ![resnet-projection](/img/resnet_projection.jpg)
 >The projection shortcut in Eqn2. is used to match dimensions (done by 1x1 conv). For both options, when the shortcuts go across feature maps of two sizes, they are performed with a stride of 2.(Resnet原文介绍Projection)
 
@@ -172,12 +172,12 @@ class BasicBlock(nn.Module):#BasicBlock模块
 class Bottleneck(nn.Module):#Bottleneck模块
     expansion = 4
     #注意，bottleneck要对输入通道做4倍拉升,可以看上面的结构示意图中每个Block结构
-
+    #Bottleneck通道数量变化：256->64->64->256
     def __init__(self, , stride=1, downsample=None):
         super(Bottleneck, self).__init__()
         self.conv1 = nn.Conv2d(inplanes, planes, kernel_size=1, bias=False)
         self.bn1 = nn.BatchNorm2d(planes)
-        self.conv2 = nn.Conv2d(planes, planes, kernel_size=3, stride=stride,
+        self.conv2 = nn.Conv2d(planes, planes, kernel_size=3, stride=stride,#该conv负责stride=2降低scale
                                padding=1, bias=False)
         self.bn2 = nn.BatchNorm2d(planes)
         self.conv3 = nn.Conv2d(planes, planes * 4, kernel_size=1, bias=False)
