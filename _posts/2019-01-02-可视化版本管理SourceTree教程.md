@@ -9,12 +9,15 @@ categories: jekyll update
 * 检出分支
 <<<<<<< HEAD
 ![分支](/img/sourcetree_checkout.png)  
+
 =======
 >>>>>>> featrue_1
 通常项目是三种分支类型：
  * master:主分支，稳定版本；
  * develop: 日常开发分支，每个项目版本稳定之后，合并到master分支；
  * fix： 线上紧急bug,从master创建fix分支，修复测试通过后，合并到master主分支
+
+
 <<<<<<< HEAD
 ![检出](/img/sourcetree_branch.png)
 #### 暂存、丢弃、移除的区别
@@ -54,3 +57,9 @@ A->B->C 回滚
 
 >回滚提交会取消上一次的commit，算一次revert，同时这次revert也会被提交，可以看到文件夹中之前上传的的文件没了
 ![回滚图片](/img/revert.png)
+
+
+## 分支合并
+先checkout到目的分支,如果打算合并branch1到branch2,先checkout到branch2,然后在branch1的哪个地方右键合并到当前
+![xs](/img/sourcetree_mergeBranch_2.png)
+![xs](/img/sourtree_mergeBranch.png)
